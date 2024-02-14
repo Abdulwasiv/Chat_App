@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
+import './App.css'
 
 function Chat({ socket, username, room }) {
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
 
   const sendMessage = async () => {
     if (currentMessage !== "") {
@@ -20,19 +22,45 @@ function Chat({ socket, username, room }) {
       await socket.emit("send_message", messageData);
       setMessageList((list) => [...list, messageData]);
       setCurrentMessage("");
+      setIsTyping(false);
     }
   };
+  const handleTyping = () => {
+    if (!isTyping) {
+      setIsTyping(true);
+      socket.emit("start_typing");
+    }
 
-  useEffect(() => {
-    socket.on("receive_message", (data) => {
+   setTimeout(() => {
+      setIsTyping(false);
+      socket.emit("stop_typing");
+    }, 3000);
+  };
+
+ useEffect(() => {
+    const receiveMessageHandler = (data) => {
       setMessageList((list) => [...list, data]);
-    });
+    };
+
+    const receiveTypingHandler = (isTypingData) => {
+      setIsTyping(isTypingData);
+    };
+
+    socket.on("receive_message", receiveMessageHandler);
+    socket.on("receive_typing", receiveTypingHandler);
+
+    return () => {
+      socket.off("receive_message", receiveMessageHandler);
+      socket.off("receive_typing", receiveTypingHandler);
+    };
   }, [socket]);
 
   return (
     <div className="chat-window">
-      <div className="chat-header">
-        <p>Live Chat</p>
+      <div className="chat-header"> 
+      <p className="typing-indicator" >
+        Chat_Room: {room}  {isTyping && `- someone is typing...`}
+        </p>
       </div>
       <div className="chat-body">
         <ScrollToBottom className="message-container">
@@ -63,14 +91,13 @@ function Chat({ socket, username, room }) {
           placeholder="Hey..."
           onChange={(event) => {
             setCurrentMessage(event.target.value);
+            handleTyping(); // Trigger typing when input changes
           }}
-          onKeyPress={(event) => {
-            event.key === "Enter" && sendMessage();
-          }}
+          onKeyPress={(event) => event.key === "Enter" && sendMessage()}
         />
         <button onClick={sendMessage}>&#9658;</button>
       </div>
-    </div>
+          </div>
   );
 }
 
