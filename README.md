@@ -4,19 +4,27 @@ A real-time chat application built with the MERN (MongoDB, Express.js, React.js,
 
 Getting Started
 
-#Clone the repository:
-#git clone https://github.com/Abdulwasiv/Chat_App.git
+Clone the repository:
 
-#Install dependencies for the server
-#cd Back_end
-#npm install
-#npm start
+git clone https://github.com/Abdulwasiv/Chat_App.git
+
+Install dependencies for the server
+
+cd Back_end
+
+npm install
+
+npm start
 
 Install dependencies for the client:
-#cd Front_end
-#cd chat-app
-#npm install
-#npm start
+
+cd Front_end
+
+cd chat-app
+
+npm install
+
+npm start
 
 #Open your browser and go to http://localhost:3000 to use the chat app.
 
